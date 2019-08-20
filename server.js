@@ -8,6 +8,7 @@ app.get('/', function(req, res){
 });
 
 io.origins((origin, callback) => {
+    console.log('Validate Origin: ' + origin );
     if (origin !== 'https://access-app-conection-front.herokuapp.com') {
         console.log('Origin: ' + origin + ' not allowed');
       return callback('origin not allowed', false);
