@@ -7,6 +7,14 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
+io.origins((origin, callback) => {
+    if (origin !== 'https://access-app-conection-front.herokuapp.com') {
+        console.log('Origin: ' + origin + ' not allowed');
+      return callback('origin not allowed', false);
+    }
+    callback(null, true);
+});
+
 io.on('connection', function(socket){
   console.log('a user connected:', socket.id);
   console.log('handshake:', socket.handshake)
