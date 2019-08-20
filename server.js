@@ -1,7 +1,13 @@
 var app = require('express')();
 const uuidv1 = require('uuid/v1');
+var memjs = require('memjs');
+
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
+var memcached = memjs.Client.create(process.env.MEMCACHEDCLOUD_SERVERS, {
+  username: process.env.MEMCACHEDCLOUD_USERNAME,
+  password: process.env.MEMCACHEDCLOUD_PASSWORD
+});
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -22,10 +28,18 @@ io.on('connection', function(socket){
 
   socket.on('getClientId', function(app, fn){
     console.log('App: ' + app);
-    fn(uuidv1());
+    
+    var clientId = uuidv1();
+    memcached.set(app, clientId);
+    fn(clientId);
   });
 
   socket.on('disconnect', function(){
+    memcached.get("mybookings", function (err, value, key) {
+      if (value != null) {
+        console.log(value.toString()); // Will print clientId
+      }
+    });
     console.log('user disconnected', socket.id);
   });
 });
