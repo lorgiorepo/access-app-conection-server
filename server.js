@@ -30,7 +30,10 @@ io.on('connection', function(socket){
     console.log('App: ' + app);
     
     var clientId = uuidv1();
-    memcached.set(app, clientId);
+    memcached.set(app, clientId, {expires:120}, function(err, val) {
+      console.log(val, 'expired');
+    });
+
     fn(clientId);
   });
 
